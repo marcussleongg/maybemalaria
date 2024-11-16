@@ -3,6 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAU-qMK7iqlaPfllH4w5BCqW2GI6X_sf1M&libraries=places" defer></script>
+<script type="text/javascript" src="script2.js" defer></script>
 <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
 <title>Malaria Search</title>
 <!-- Link to the external CSS file -->
@@ -18,7 +20,7 @@
     <section class="search-section">
         <div class="search-bar">
             <span class="search-icon">🔍</span>
-            <input type="text" class="search-input" placeholder="Current location? Search a location?">
+            <input id= "autocomplete" type="text"  class="search-input" placeholder="Current location? Search a location?">
         </div>
     </section>
     <section class="questions-section">
