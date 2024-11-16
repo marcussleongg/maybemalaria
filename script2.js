@@ -19,5 +19,4 @@ function handlePlaceSelect() {
   const lng = place.geometry.location.lng();
   console.log(lat, lng);
   return [lat, lng];
-  
 }
