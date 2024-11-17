@@ -1,14 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAU-qMK7iqlaPfllH4w5BCqW2GI6X_sf1M&libraries=places" defer></script>
-<script type="text/javascript" src="script2.js" defer></script>
-<link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
-<title>Malaria Search</title>
-<!-- Link to the external CSS file -->
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAU-qMK7iqlaPfllH4w5BCqW2GI6X_sf1M&libraries=places" defer></script>
+    <script type="text/javascript" src="script2.js" defer></script>
+    <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
+    <title>Malaria Search</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
@@ -20,7 +19,7 @@
     <section class="search-section">
         <div class="search-bar">
             <span class="search-icon">🔍</span>
-            <input id= "autocomplete" type="text"  class="search-input" placeholder="Current location? Search a location?">
+            <input id="autocomplete" type="text" class="search-input" placeholder="Current location? Search a location?">
         </div>
     </section>
 
@@ -69,7 +68,6 @@
         <div class="question">
             <label for="age">What is your age?</label>
             <input type="number" id="age" name="age" class="age-input" placeholder="Enter your age" min="1" max="120" required>
-            <!-- Output field below the input, styled to be larger -->
         </div>             
     </section>
 
@@ -77,11 +75,11 @@
     <div class="navigation">
         <button id="back-btn" onclick="navigate(-1)">Back</button>
         <button id="next-btn" onclick="navigate(1)">Next</button>
-        <button id="finish-btn" onclick="finishQuiz()" style="display: none;">Finish</button>
+        <button id="finish-btn" onclick="finishInput()" style="display: none;">Finish</button>
     </div>
 
     <!-- Malaria Susceptibility Section -->
-    <section class="susceptibility-section">
+    <section class="susceptibility-section" style="display:none;">
         <h2>How susceptible to malaria you will be</h2>
         <div class="malaria-output">
             <p><strong>Recent counts of malaria cases at your chosen location:</strong> <span id="malaria-cases">Loading...</span></p>
@@ -94,6 +92,7 @@
     let currentQuestionIndex = 1;
     const totalQuestions = 5;
 
+    // Function to handle Next and Back buttons
     function navigate(direction) {
         // Hide the current question
         document.getElementById(`question${currentQuestionIndex}`).style.display = 'none';
@@ -108,23 +107,76 @@
         // Show the next question
         document.getElementById(`question${currentQuestionIndex}`).style.display = 'block';
 
-        // Toggle the visibility of Back, Next, and Finish buttons
+        // Toggle visibility of Back, Next, and Finish buttons
         document.getElementById('back-btn').style.display = currentQuestionIndex === 1 ? 'none' : 'inline-block';
         document.getElementById('next-btn').style.display = currentQuestionIndex === totalQuestions ? 'none' : 'inline-block';
         document.getElementById('finish-btn').style.display = currentQuestionIndex === totalQuestions ? 'inline-block' : 'none';
+
     }
 
     // Function to handle Finish button click
-    function finishQuiz() {
-        alert("Thank you for completing the quiz!");
-        // Additional actions can be added here, like submitting form data
+    function finishInput() {
+        const unansweredQuestions = getUnansweredQuestions();
+
+        if (unansweredQuestions.length > 0) {
+            // Show warning message and wait for user confirmation
+            const proceed = confirm("You have not answered some of the questions. Do you wish to proceed?");
+            
+            if (proceed) {
+                // User confirmed, proceed with hiding the question section
+                displaySusceptibilitySection();
+                document.getElementById('finish-btn').style.display = 'none';
+                document.getElementById('back-btn').style.display = 'none';
+            }
+        } else {
+            // No unanswered questions, directly display susceptibility section
+            displaySusceptibilitySection();
+            document.getElementById('finish-btn').style.display = 'none';
+            document.getElementById('back-btn').style.display = 'none';
+        }
+    }
+
+    // Helper function to check for unanswered questions
+    function getUnansweredQuestions() {
+        const unanswered = [];
+
+        // Check for each question if it has been answered
+        for (let i = 1; i <= totalQuestions; i++) {
+            const questionSection = document.getElementById(`question${i}`);
+            const inputs = questionSection.querySelectorAll('input[type="radio"], input[type="number"]');
+
+            let isAnswered = false;
+            inputs.forEach((input) => {
+                if ((input.type === "radio" && input.checked) || 
+                    (input.type === "number" && input.value.trim() !== "")) {
+                    isAnswered = true;
+                }
+            });
+
+            if (!isAnswered) {
+                unanswered.push(i);
+            }
+        }
+
+        return unanswered;
+    }
+
+    // Function to display the susceptibility section and hide question section
+    function displaySusceptibilitySection() {
+        // Hide all question sections
+        const questionSections = document.querySelectorAll('.question-section');
+        questionSections.forEach(section => section.style.display = 'none');
+
+        // Show the susceptibility section
+        document.querySelector('.susceptibility-section').style.display = 'block';
     }
 
     // Initialize the first question
-    document.addEventListener("DOMContentLoaded", function() {
+    document.addEventListener("DOMContentLoaded", function () {
         navigate(0);
     });
 </script>
 <script src="script.js"></script>
+
 </body>
 </html>
