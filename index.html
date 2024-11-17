@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAU-qMK7iqlaPfllH4w5BCqW2GI6X_sf1M&libraries=places" defer></script>
-    <script type="text/javascript" src="script2.js" defer></script>
+    <script type="text/javascript" src="script.js" defer></script>
     <link href='https://fonts.googleapis.com/css?family=Poppins' rel='stylesheet'>
     <title>Malaria Search</title>
     <link rel="stylesheet" href="styles.css">
@@ -84,6 +84,10 @@
         <div class="malaria-output">
             <p><strong>Recent counts of malaria cases at your chosen location:</strong> <span id="malaria-cases">Loading...</span></p>
             <p><strong>How susceptible you will be to contracting Malaria:</strong> <span id="malaria-susceptibility">Loading...</span></p>
+            <p id="tempText">Temperature is </p>
+            <p id="precipText">Precipitation is</p>
+            <p id="humidityText">Humidity is </p>
+            <p id="altitudeText">Altitude is</p>
         </div>
     </section>
 </div>
@@ -176,7 +180,6 @@
         navigate(0);
     });
 </script>
-<script src="script.js"></script>
 
 </body>
 </html>

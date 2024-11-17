@@ -1218,20 +1218,28 @@ function initAutocomplete() {
   const input = document.getElementById("autocomplete");
   autocomplete = new google.maps.places.Autocomplete(input);
   autocomplete.addListener("place_changed", handlePlaceSelect);
-
-
-function handlePlaceSelect() {
-  const place = autocomplete.getPlace();
-  if (!place.geometry) {
-    return;
-  }
-
-  const lat = place.geometry.location.lat();
-  const lng = place.geometry.location.lng();
-  console.log(lat, lng);
-
-  return [lat, lng];
 }
+
+function handlePlaceSelect(optionalUserLocation) {
+    if (optionalUserLocation == null) {
+        const place = autocomplete.getPlace();
+        if (!place.geometry) {
+            return;
+        }
+
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        console.log(lat, lng);
+        amendDOM([lat, lng]);
+        //return [lat, lng];
+        }
+    else {
+        const place = optionalUserLocation;
+        const lat = place.geometry.location.lat();
+        const lng = place.geometry.location.lng();
+        console.log(lat, lng);
+        amendDOM([lat, lng]);
+    }
 }
 
 const inputArray = initAutocomplete();
@@ -1306,67 +1314,84 @@ function countHotspotsNearby(inputArray) {
 }
 
 function calculateMalariaLikelihood(altitude, humidity, precipitation, temperature, hotspotCount) {
-    const A_weight = 0.15; 
-    const H_weight = 0.25; 
-    const P_weight = 0.20; 
-    const T_weight = 0.35; 
-
-    const altitudeContribution = 1 - (altitude / 1000);
-
-    const humidityContribution = Math.min(humidity / 100, 1);
-
-    const precipitationContribution = (precipitation > 0 && precipitation < 100) ? (precipitation / 100) : (precipitation < 300 ? 1 : 0);
-
-    const temperatureContribution = temperature >= 16 && temperature <= 34
-        ? (1 - Math.abs(temperature - 29) / 18) * T_weight
-        : 0;
-    const hotspotContribution = hotspotCount > 0 ? Math.min(hotspotCount / 5, 1) : 0; 
-
-    const totalLikelihood = (altitudeContribution * A_weight) + (humidityContribution * H_weight) + (precipitationContribution * P_weight) + temperatureContribution + hotspotContribution;
-
-    return Math.min(totalLikelihood * 100, 100); 
-}
+    const A_weight = 0.15;
+    const H_weight = 0.25;
+    const P_weight = 0.20;
+    const T_weight = 0.35;
+ 
+    const altitudeContribution = 1 - Math.log10(1+(altitude / 3000));
+ 
+    const humidityContribution = ((humidity-30)/(60));
+ 
+    const precipitationContribution = precipitation > 300 ? 0 : precipitation >= 50 && precipitation <= 300 ? (1 - Math.abs(precipitation - 150) / 250) : 0;
+    const temperatureContribution = temperature < 15 || temperature > 34 ? 0 : (1 - Math.abs(temperature - 29) / (34 - 15)) * (1 + 0.22);
+    const hotspotContribution = hotspotCount === 0 ? 0 : Math.min(1, Math.log(hotspotCount + 1) / Math.log(5));
+ 
+    const totalLikelihood = ((altitudeContribution * A_weight) + (humidityContribution * H_weight) + (precipitationContribution * P_weight) + (temperatureContribution * T_weight) + hotspotContribution) * 100;
+    console.log(totalLikelihood);
+    return totalLikelihood;
+ }
+ 
 
 async function amendDOM(inputArray) {
     const resultArray = await getWeather(inputArray);
-    const susSection = document.querySelector('.susceptibility-section');
+    //const susSection = document.querySelector('.susceptibility-section');
     const casesOutput = document.querySelector("#malaria-cases");
+    const susceptibilityOutput = document.querySelector('#malaria-susceptibility');
     const altitude = resultArray[5];
     const humidity = resultArray[4];
     const precipitation = resultArray[2];
     const temperature = resultArray[1];
-
+    const tempText = document.querySelector('#tempText');
+    const precipText = document.querySelector('#precipText');
+    const humidityText = document.querySelector('#humidityText');
+    const altitudeText = document.querySelector('#altitudeText');
     
     const hotspotCount = countHotspotsNearby(inputArray);
     
     
     const malariaLikelihood = calculateMalariaLikelihood(altitude, humidity, precipitation, temperature, hotspotCount);
     
- 
-    casesOutput.textContent = `Malaria Likelihood: ${malariaLikelihood.toFixed(2)}%`;
-    const temperatureDiv = document.createElement("div");
-    susSection.appendChild(temperatureDiv);
-    const tempText = document.createElement("p");
+    casesOutput.textContent = countHotspotsNearby(inputArray);
+    susceptibilityOutput.textContent = `Malaria Likelihood: ${malariaLikelihood.toFixed(2)}%`;
+    
     tempText.textContent = `Temperature is ${resultArray[0]}°F (${temperature}°C)`;
-    temperatureDiv.appendChild(tempText);
-
-    const precipDiv = document.createElement("div");
-    susSection.appendChild(precipDiv);
-    const precipText = document.createElement("p");
     precipText.textContent = `Precipitation(mm) is ${resultArray[2]}`;
-    precipDiv.appendChild(precipText);
-
-    const humidityDiv = document.createElement("div");
-    susSection.appendChild(humidityDiv);
-    const humidityText = document.createElement("p");
     humidityText.textContent = `Humidity(%) is ${resultArray[4]}`;
-    humidityDiv.appendChild(humidityText);
-
-    const altitudeDiv = document.createElement("div");
-    susSection.appendChild(altitudeDiv);
-    const altitudeText = document.createElement("p");
     altitudeText.textContent = `Altitude is ${resultArray[5]} meters`;
-    altitudeDiv.appendChild(altitudeText);
 }
+
+function getUserLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const lat = position.coords.latitude;
+        const lng = position.coords.longitude;
+        console.log(`User's Location: Latitude: ${lat}, Longitude: ${lng}`);
+        
+        // Reverse geocode to get the address
+        const geocoder = new google.maps.Geocoder();
+        const latLng = new google.maps.LatLng(lat, lng);
+  
+        geocoder.geocode({ location: latLng }, (results, status) => {
+          if (status === google.maps.GeocoderStatus.OK) {
+            if (results[0]) {
+              const address = results[0].formatted_address;
+              document.getElementById("autocomplete").value = address; // Auto-fill the input
+              const place = { geometry: { location: new google.maps.LatLng(lat, lng) }};
+              handlePlaceSelect(place);
+            }
+          } else {
+            alert("Geocoder failed due to: " + status);
+          }
+        });
+      }, (error) => {
+        alert("Geolocation failed: " + error.message);
+      });
+    } else {
+      alert("Geolocation is not supported by this browser.");
+    }
+  }
+
+getUserLocation();
 
 amendDOM([11.05, 76.876]);
