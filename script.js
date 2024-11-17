@@ -1393,5 +1393,3 @@ function getUserLocation() {
   }
 
 getUserLocation();
-
-amendDOM([11.05, 76.876]);
