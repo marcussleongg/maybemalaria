@@ -1374,7 +1374,7 @@ async function amendDOM(inputArray) {
     updateSusceptibilityBackground(malariaLikelihood);
 }
 
-function getUserLocation() {
+/*function getUserLocation() {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
         const lat = position.coords.latitude;
@@ -1405,4 +1405,4 @@ function getUserLocation() {
     }
   }
 
-getUserLocation();
+getUserLocation();*/
