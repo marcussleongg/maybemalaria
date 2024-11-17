@@ -1208,72 +1208,26 @@ const whodata = {"1": [12.939600,79.239700],
 "1208": [-3.416549,29.930526],
 "1209": [-3.418100,29.938350]}
 
-let autocomplete;
-
-document.addEventListener("DOMContentLoaded", () => {
-  initAutocomplete();
-});
-
-function initAutocomplete() {
-  const input = document.getElementById("autocomplete");
-  autocomplete = new google.maps.places.Autocomplete(input);
-  autocomplete.addListener("place_changed", handlePlaceSelect);
-
-
-function handlePlaceSelect() {
-  const place = autocomplete.getPlace();
-  if (!place.geometry) {
-    return;
-  }
-
-  const lat = place.geometry.location.lat();
-  const lng = place.geometry.location.lng();
-  console.log(lat, lng);
-
-  return [lat, lng];
-}
-}
-
-const inputArray = initAutocomplete();
-
-function getAltitude(inputArray) {
-    const elevationUrl = `https://api.open-meteo.com/v1/elevation?latitude=${inputArray[0]}&longitude=${inputArray[1]}`;
-    return fetch(elevationUrl)
-        .then((response) => response.json())
-        .then((data) => {
-        const elevation = data.elevation[0];
-        console.log(elevation);
-        return elevation;
-    })
-}
-
-function getUrl(inputArray) {
-    console.log('this seems to be working');
+//might want to incude past 10 days of data instead
+function getWeather(inputArray) {
     const inputLat = inputArray[0];
     const inputLon = inputArray[1];
     const weatherUrl = `http://api.weatherapi.com/v1/current.json?key=6c99696223224d338cc210510241611&q=${inputLat},${inputLon}&aqi=no`;
-    return weatherUrl;
-}
-
-//might want to incude past 10 days of data instead
-async function getWeather(inputArray) {
     function httpGet(theUrl) {
         var xmlHttp = new XMLHttpRequest();
         xmlHttp.open( "GET", theUrl, false );
         xmlHttp.send( null );
         return xmlHttp.responseText;
     }
-    const weatherUrl = getUrl(inputArray);
     const jsonStr = httpGet(weatherUrl);
     const jsonObj = JSON.parse(jsonStr);
+    console.log(httpGet(weatherUrl));
     const tempF = jsonObj.current.temp_f;
     const tempC = jsonObj.current.temp_c;
     const precipitationMm = jsonObj.current.precip_mm;
     const precipitationIn = jsonObj.current.precip_in;
     const humidity = jsonObj.current.humidity;
-    const altitude = await getAltitude(inputArray);
-    console.log(altitude);
-    return [tempF, tempC, precipitationMm, precipitationIn, humidity, altitude];
+    return [tempF, tempC, precipitationMm, precipitationIn, humidity];
 }
   
 function deg2rad(deg) {
@@ -1305,32 +1259,19 @@ function countHotspotsNearby(inputArray) {
     return hotspot_count;
 }
 
-async function amendDOM(inputArray) {
-    const resultArray = await getWeather(inputArray);
-    const susSection = document.querySelector('.susceptibility-section');
+function amendDOM(inputArray) {
+    const resultArray = getWeather(inputArray);
+    const body = document.querySelector('body');
     const casesOutput = document.querySelector("#malaria-cases");
+    //const susOutput = document.querySelector(".malaria-susceptibility");
     casesOutput.textContent = countHotspotsNearby(inputArray);
-    const temperature = document.createElement("div");
-    susSection.appendChild(temperature);
-    const tempText = document.createElement("p");
-    tempText.textContent = `Temperature is ${resultArray[0]}`;
-    temperature.appendChild(tempText);
-    const precip = document.createElement("div");
-    susSection.appendChild(precip);
-    const precipText = document.createElement("p");
-    precipText.textContent = `Precipitation(mm) is ${resultArray[2]}`;
-    precip.appendChild(precipText);
-    const humidity = document.createElement("div");
-    susSection.appendChild(humidity);
-    const humidityText = document.createElement("p");
-    humidityText.textContent = `Humidity(%) is ${resultArray[4]}`;
-    humidity.appendChild(humidityText);
-    const altitude = document.createElement("div");
-    susSection.appendChild(altitude);
-    const altitudeText = document.createElement("p");
-    altitudeText.textContent = `Altitude is ${resultArray[5]}`;
-    altitude.appendChild(altitudeText);
-    //susSection.appendChild(casesText);
+    //casesOutput.appendChild(casesText);
 }
 
+const dist = calculateDist([1.290270, 103.851959], [12.939600, 79.239700]);
+console.log(dist);
+const mydata = {"1": [1.3, 103.5]};
+console.log(mydata[1]);
+countHotspotsNearby([1.290270, 103.851959]);
+//getWeather([1.290270, 103.851959]);
 amendDOM([11.05, 76.876]);
