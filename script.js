@@ -1208,8 +1208,6 @@ const whodata = {"1": [12.939600,79.239700],
 "1208": [-3.416549,29.930526],
 "1209": [-3.418100,29.938350]}
 
-const body = document.querySelector('body');
-
 //might want to incude past 10 days of data instead
 function getWeather(inputArray) {
     const inputLat = inputArray[0];
@@ -1229,12 +1227,7 @@ function getWeather(inputArray) {
     const precipitationMm = jsonObj.current.precip_mm;
     const precipitationIn = jsonObj.current.precip_in;
     const humidity = jsonObj.current.humidity;
-    console.log('hi');
-    console.log(`temperature in farenheit is ${tempF}`);
-    console.log(`temperature in celcius is ${tempC}`);
-    console.log(`precipitation in mm is ${precipitationMm}`);
-    console.log(`precipitation in inches is ${precipitationIn}`);
-    console.log(`humidity percentage is ${humidity}`);
+    return [tempF, tempC, precipitationMm, precipitationIn, humidity];
 }
   
 function deg2rad(deg) {
@@ -1257,17 +1250,28 @@ function calculateDist(inputArray, historicalArray) {
 }
 
 function countHotspotsNearby(inputArray) {
-    const hotspot_count = 0;
+    var hotspot_count = 0;
     for (let i=1; i<=1209; i++) {
-        if(calculateDist(inputArray, mydata[i]) <= 2) {
+        if(calculateDist(inputArray, whodata[i]) <= 2) {
             hotspot_count += 1;
         }
     }
     return hotspot_count;
 }
 
+function amendDOM(inputArray) {
+    const resultArray = getWeather(inputArray);
+    const body = document.querySelector('body');
+    const casesOutput = document.querySelector("#malaria-cases");
+    //const susOutput = document.querySelector(".malaria-susceptibility");
+    casesOutput.textContent = countHotspotsNearby(inputArray);
+    //casesOutput.appendChild(casesText);
+}
+
 const dist = calculateDist([1.290270, 103.851959], [12.939600, 79.239700]);
 console.log(dist);
 const mydata = {"1": [1.3, 103.5]};
 console.log(mydata[1]);
-getWeather([1.290270, 103.851959]);
+countHotspotsNearby([1.290270, 103.851959]);
+//getWeather([1.290270, 103.851959]);
+amendDOM([11.05, 76.876]);
