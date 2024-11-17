@@ -1305,32 +1305,68 @@ function countHotspotsNearby(inputArray) {
     return hotspot_count;
 }
 
+function calculateMalariaLikelihood(altitude, humidity, precipitation, temperature, hotspotCount) {
+    const A_weight = 0.15; 
+    const H_weight = 0.25; 
+    const P_weight = 0.20; 
+    const T_weight = 0.35; 
+
+    const altitudeContribution = 1 - (altitude / 1000);
+
+    const humidityContribution = Math.min(humidity / 100, 1);
+
+    const precipitationContribution = (precipitation > 0 && precipitation < 100) ? (precipitation / 100) : (precipitation < 300 ? 1 : 0);
+
+    const temperatureContribution = temperature >= 16 && temperature <= 34
+        ? (1 - Math.abs(temperature - 29) / 18) * T_weight
+        : 0;
+    const hotspotContribution = hotspotCount > 0 ? Math.min(hotspotCount / 5, 1) : 0; 
+
+    const totalLikelihood = (altitudeContribution * A_weight) + (humidityContribution * H_weight) + (precipitationContribution * P_weight) + temperatureContribution + hotspotContribution;
+
+    return Math.min(totalLikelihood * 100, 100); 
+}
+
 async function amendDOM(inputArray) {
     const resultArray = await getWeather(inputArray);
     const susSection = document.querySelector('.susceptibility-section');
     const casesOutput = document.querySelector("#malaria-cases");
-    casesOutput.textContent = countHotspotsNearby(inputArray);
-    const temperature = document.createElement("div");
-    susSection.appendChild(temperature);
+    const altitude = resultArray[5];
+    const humidity = resultArray[4];
+    const precipitation = resultArray[2];
+    const temperature = resultArray[1];
+
+    
+    const hotspotCount = countHotspotsNearby(inputArray);
+    
+    
+    const malariaLikelihood = calculateMalariaLikelihood(altitude, humidity, precipitation, temperature, hotspotCount);
+    
+ 
+    casesOutput.textContent = `Malaria Likelihood: ${malariaLikelihood.toFixed(2)}%`;
+    const temperatureDiv = document.createElement("div");
+    susSection.appendChild(temperatureDiv);
     const tempText = document.createElement("p");
-    tempText.textContent = `Temperature is ${resultArray[0]}`;
-    temperature.appendChild(tempText);
-    const precip = document.createElement("div");
-    susSection.appendChild(precip);
+    tempText.textContent = `Temperature is ${resultArray[0]}°F (${temperature}°C)`;
+    temperatureDiv.appendChild(tempText);
+
+    const precipDiv = document.createElement("div");
+    susSection.appendChild(precipDiv);
     const precipText = document.createElement("p");
     precipText.textContent = `Precipitation(mm) is ${resultArray[2]}`;
-    precip.appendChild(precipText);
-    const humidity = document.createElement("div");
-    susSection.appendChild(humidity);
+    precipDiv.appendChild(precipText);
+
+    const humidityDiv = document.createElement("div");
+    susSection.appendChild(humidityDiv);
     const humidityText = document.createElement("p");
     humidityText.textContent = `Humidity(%) is ${resultArray[4]}`;
-    humidity.appendChild(humidityText);
-    const altitude = document.createElement("div");
-    susSection.appendChild(altitude);
+    humidityDiv.appendChild(humidityText);
+
+    const altitudeDiv = document.createElement("div");
+    susSection.appendChild(altitudeDiv);
     const altitudeText = document.createElement("p");
-    altitudeText.textContent = `Altitude is ${resultArray[5]}`;
-    altitude.appendChild(altitudeText);
-    //susSection.appendChild(casesText);
+    altitudeText.textContent = `Altitude is ${resultArray[5]} meters`;
+    altitudeDiv.appendChild(altitudeText);
 }
 
 amendDOM([11.05, 76.876]);
