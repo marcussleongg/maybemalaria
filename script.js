@@ -1331,18 +1331,6 @@ function calculateMalariaLikelihood(altitude, humidity, precipitation, temperatu
     console.log(totalLikelihood);
     return totalLikelihood;
  }
-
- function updateSusceptibilityBackground(likelihood) {
-  const susceptibilitySection = document.querySelector('.susceptibility-section');
-  
-  if (likelihood >= 60) {
-      susceptibilitySection.style.backgroundColor = '#d43131';
-  } else if (likelihood >= 30) {
-      susceptibilitySection.style.backgroundColor = '#ffda24';
-  } else {
-      susceptibilitySection.style.backgroundColor = '#33de3e';
-  }
-}
  
 
 async function amendDOM(inputArray) {
@@ -1371,8 +1359,6 @@ async function amendDOM(inputArray) {
     precipText.textContent = `Precipitation(mm) is ${resultArray[2]}`;
     humidityText.textContent = `Humidity(%) is ${resultArray[4]}`;
     altitudeText.textContent = `Altitude is ${resultArray[5]} meters`;
-
-    updateSusceptibilityBackground(malariaLikelihood);
 }
 
 function getUserLocation() {
