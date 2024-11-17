@@ -1327,7 +1327,7 @@ function calculateMalariaLikelihood(altitude, humidity, precipitation, temperatu
     const temperatureContribution = temperature < 15 || temperature > 34 ? 0 : (1 - Math.abs(temperature - 29) / (34 - 15)) * (1 + 0.22);
     const hotspotContribution = hotspotCount === 0 ? 0 : Math.min(1, Math.log(hotspotCount + 1) / Math.log(5));
  
-    const totalLikelihood = ((altitudeContribution * A_weight) + (humidityContribution * H_weight) + (precipitationContribution * P_weight) + (temperatureContribution * T_weight) + hotspotContribution) * 100;
+    const totalLikelihood = ((altitudeContribution * A_weight) + (humidityContribution * H_weight) + (precipitationContribution * P_weight) + (temperatureContribution * T_weight) + (hotspotContribution*0.15)) * 100;
     console.log(totalLikelihood);
     return totalLikelihood;
  }
