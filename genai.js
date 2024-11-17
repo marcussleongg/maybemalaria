@@ -31,7 +31,7 @@ if (ageText != null) {
 }
 
 // Your AI prompt
-const prompt = `Without the precautionary text telling me to check with health advisories, what are preventive measures for malaria for at an area where ${tempText}, ${precipText}, ${humidityText}, ${altitudeText}, and if ${infantText}, ${hivaidsText}, ${pregnantText}, ${travelingText}, ${ageText}`;
+const prompt = `Without the precautionary text telling me to check with health advisories, and telling me about the null values, what are preventive measures for malaria for at an area where ${tempText}, ${precipText}, ${humidityText}, ${altitudeText}, and if ${infantText}, ${hivaidsText}, ${pregnantText}, ${travelingText}, ${ageText}`;
 async function getContent() {
     const result = await model.generateContent(prompt);
     const container = document.querySelector('.container');
