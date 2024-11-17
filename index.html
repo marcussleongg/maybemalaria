@@ -122,7 +122,47 @@
     // Function to handle Finish button click
     function finishInput() {
         const unansweredQuestions = getUnansweredQuestions();
-
+        const body = document.querySelector('body');
+        const infantAnswer = document.querySelector('input[name="infant"][value="yes"]:checked');
+        if (infantAnswer != null) {
+            const infantText = document.createElement('p');
+            infantText.textContent = 'I have one or more children under the age of 5';
+            infantText.setAttribute('id', 'infantText');
+            infantText.style.display = 'none';
+            body.appendChild(infantText);
+        }
+        const hivaidsAnswer = document.querySelector('input[name="hiv"][value="yes"]:checked');
+        if (hivaidsAnswer != null) {
+            const hivaidsText = document.createElement('p');
+            hivaidsText.textContent = 'I have HIV/AIDS';
+            hivaidsText.setAttribute('id', 'hivaidsText');
+            hivaidsText.style.display = 'none';
+            body.appendChild(hivaidsText);
+        }
+        const pregnantAnswer = document.querySelector('input[name="pregnant"][value="yes"]:checked');
+        if (pregnantAnswer != null) {
+            const pregnantText = document.createElement('p');
+            pregnantText.textContent = 'I am pregnant';
+            pregnantText.setAttribute('id', 'pregnantText');
+            pregnantText.style.display = 'none';
+            body.appendChild(pregnantText);
+        }
+        const travelingAnswer = document.querySelector('input[name="traveling"][value="yes"]:checked');
+        if (travelingAnswer != null) {
+            const travelingText = document.createElement('p');
+            travelingText.textContent = 'I have never been here before';
+            travelingText.setAttribute('id', 'travelingText');
+            travelingText.style.display = 'none';
+            body.appendChild(travelingText);
+        }
+        const age = document.querySelector('#age').value;
+        if (age != "") {
+            const ageText = document.createElement('p');
+            ageText.textContent = `I am ${age} years old`;
+            ageText.setAttribute('id', 'ageText');
+            ageText.style.display = 'none';
+            body.appendChild(ageText);
+        }
         if (unansweredQuestions.length > 0) {
             // Show warning message and wait for user confirmation
             const proceed = confirm("You have not answered some of the questions. Do you wish to proceed?");
@@ -179,11 +219,20 @@
         genButton.textContent = "What should I do?";
         const navSection = document.querySelector('.navigation');
         const body = document.querySelector('body');
-        const genScript = document.createElement('script');
-        genScript.type = 'module';
-        genScript.src = 'genai.js';
         navSection.appendChild(genButton);
-        genButton.addEventListener('click', () => body.appendChild(genScript));
+        function reloadGenAIScript() {
+            const alrGenScript = document.querySelector('#genScript');
+            if (alrGenScript != null) {
+                alrGenScript.remove();
+                console.log('hi');
+            }
+            const genScript = document.createElement('script');
+            genScript.type = 'module';
+            genScript.src = 'genai.js';
+            genScript.setAttribute('id', 'genScript');
+            body.appendChild(genScript);
+        }
+        genButton.addEventListener('click', () => reloadGenAIScript());
     }
 
     
