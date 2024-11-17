@@ -11,10 +11,13 @@ body {
     color: #e1e8ed;
     font-family: 'Poppins';
     display: flex;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: flex-start;
     align-items: center;
     height: 50vmax;
+    min-height: 100vh;
     margin: 0;
+    overflow-y: auto; /* Enable vertical scrolling */
 }
 
 /* Container for the page */
