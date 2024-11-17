@@ -38,6 +38,7 @@ async function getContent() {
     const suggestion = document.createElement('section');
     const suggestionText = document.createElement('p');
     suggestionText.textContent = result.response.text();
+    suggestionText.style.lineHeight = 1.8;
     container.appendChild(suggestion);
     suggestion.appendChild(suggestionText);
     //console.log(result.response.text());
