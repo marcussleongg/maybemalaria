@@ -1263,7 +1263,7 @@ function getUrl(inputArray) {
     return weatherUrl;
 }
 
-//might want to incude past 10 days of data instead
+//wanted to include past 10 days of data, but too much data to parse and call from api
 async function getWeather(inputArray) {
     function httpGet(theUrl) {
         var xmlHttp = new XMLHttpRequest();
